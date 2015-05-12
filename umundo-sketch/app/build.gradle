@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 17
+    compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.umundo.samples.sketch"
         minSdkVersion 8
-        targetSdkVersion 8
+        targetSdkVersion 22
     }
 
     buildTypes {
@@ -19,6 +19,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:18.0.0'
+    compile 'com.android.support:support-v4:22.0.0'
     compile files('libs/umundo.jar')
 }

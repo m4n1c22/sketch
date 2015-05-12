@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.umundo.samples.pingpong.test">
+    package="org.umundo.samples.sketch.test">
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8" />
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="22" />
 
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="org.umundo.samples.pingpong"
+                     android:targetPackage="org.umundo.samples.sketch"
                      android:handleProfiling="false"
                      android:functionalTest="false"
-                     android:label="Tests for org.umundo.samples.pingpong"/>
+                     android:label="Tests for org.umundo.samples.sketch"/>
 </manifest>

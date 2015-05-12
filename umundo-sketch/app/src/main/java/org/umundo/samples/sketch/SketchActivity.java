@@ -108,6 +108,7 @@ public class SketchActivity extends Activity {
 		public RenderView(Context context)
 		{
 			super(context);
+			P = new Point();
 			pixelpaint = new Paint();
 			pixelpaint.setStrokeCap(Paint.Cap.ROUND);
 			pixelpaint.setStrokeWidth(0);
