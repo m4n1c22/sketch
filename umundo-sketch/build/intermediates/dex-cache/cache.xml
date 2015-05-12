@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/m4n1c/Android/Sdk/extras/android/m2repository/com/android/support/support-v4/18.0.0/support-v4-18.0.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
+        <dex dex="/home/m4n1c/AndroidStudioProjects/umundo-sketch/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0-ed6a1fb6ed549f6065de75864f0e673b61dc6c69.jar" />
+    </item>
+    <item
+        jar="/home/m4n1c/AndroidStudioProjects/umundo-sketch/app/libs/umundo.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="ce7b00ac251e17ef462df0095f52423933935b18">
+        <dex dex="/home/m4n1c/AndroidStudioProjects/umundo-sketch/app/build/intermediates/pre-dexed/debug/umundo-cabc9948c52ee2346089da42afa720afb8ea3a23.jar" />
+    </item>
+
+</items>

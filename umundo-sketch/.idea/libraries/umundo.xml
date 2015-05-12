@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="umundo">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/umundo.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
