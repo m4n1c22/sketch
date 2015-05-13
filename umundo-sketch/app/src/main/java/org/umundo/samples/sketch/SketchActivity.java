@@ -27,6 +27,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 public class SketchActivity extends Activity {
 
 
@@ -70,7 +77,7 @@ public class SketchActivity extends Activity {
 	}
 
 	/** Class for Storing dimensions of a View.*/
-	class ViewDims {
+	class ViewDims implements Serializable{
 
 		private Point P;
 		private float width;
@@ -103,6 +110,32 @@ public class SketchActivity extends Activity {
 		public void setHeight(float ih) {
 			height = ih;
 		}
+
+        public byte[] serialize() {
+            try {
+                ByteArrayOutputStream b = new ByteArrayOutputStream();
+                ObjectOutputStream o = new ObjectOutputStream(b);
+                o.writeObject(this);
+                return b.toByteArray();
+            }
+            catch(IOException ioe)
+            {
+                //Handle logging exception
+                return null;
+            }
+        }
+
+        public Object deserialize(byte[] bytes)  {
+            try {
+                ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+                ObjectInputStream o = new ObjectInputStream(b);
+                return o.readObject();
+            }
+            catch(Exception e){
+                //Handle logging exception
+                return null;
+            }
+        }
 	}
 
 	/** Custom View for drawing */
@@ -207,7 +240,7 @@ public class SketchActivity extends Activity {
 				vd.setWidth(rv.getWidth());
 				/*TODO: Change the following code for send with an extra param of serialization of message.
 				 */
-				fooPub.send(vd); //This line is compilation issue.
+				fooPub.send(vd.serialize()); //This line is compilation issue.
 				return true;
 			}
 		});
