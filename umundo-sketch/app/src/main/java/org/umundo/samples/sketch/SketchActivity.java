@@ -27,8 +27,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.io.UnsupportedEncodingException;
-
 public class SketchActivity extends Activity {
 
 
@@ -39,6 +37,10 @@ public class SketchActivity extends Activity {
 
 	RenderView rv;
 
+	ViewDims vd;
+
+
+	/** Class which stores a x and y coordinates of a point. */
 	class Point {
 
 		private float x;
@@ -61,14 +63,54 @@ public class SketchActivity extends Activity {
 
 			return y;
 		}
+		public void setPointWithPointObj(Point ip) {
+			x = ip.getX();
+			y = ip.getY();
+		}
 	}
 
+	/** Class for Storing dimensions of a View.*/
+	class ViewDims {
+
+		private Point P;
+		private float width;
+		private float height;
+
+		/*Constructor*/
+		public ViewDims() {
+
+			width 	= 0;
+			height 	= 0;
+			P = new Point();
+		}
+		/** Getter methods */
+		public Point getPoint() {
+			return P;
+		}
+		public float getWidth() {
+			return width;
+		}
+		public float getHeight() {
+			return height;
+		}
+		/** Setter Methods */
+		public void setPoint(Point iP) {
+			P.setPointWithPointObj(iP);
+		}
+		public void setWidth(float iw) {
+			width = iw;
+		}
+		public void setHeight(float ih) {
+			height = ih;
+		}
+	}
 
 	/** Custom View for drawing */
 	class RenderView extends View
 	{
 		Paint pixelpaint;
 		Point P;
+		float scaleRatio;
 
 		public float getX() {
 
@@ -78,7 +120,6 @@ public class SketchActivity extends Activity {
 
 			return P.getY();
 		}
-
 		public Point getPoint() {
 
 			return P;
@@ -86,8 +127,7 @@ public class SketchActivity extends Activity {
 
 		public void setPoint(Point iP) {
 
-			P.setX(iP.getX());
-			P.setY(iP.getY());
+			P.setPointWithPointObj(iP);
 		}
 		public void setXandY(float ix,float iy) {
 			P.setX(ix);
@@ -95,13 +135,14 @@ public class SketchActivity extends Activity {
 		}
 		/**
 		 * Setting X and Y relative to the device. Here the mapping of the incoming coordinates are
-		 * evaluated with its width and height and the aspect ratio is determined and this value is
+		 * evaluated with its width and height and the scale ratio is determined and this value is
 		 * mapped to the new set of coordinates.
 		 */
 		public void setXandYRelative(float ix,float iy,float h,float w) {
 			float devHeight=this.getHeight();
 			float devWidth=this.getWidth();
 
+			scaleRatio = devHeight/h;
 			setXandY(ix*devWidth/w,iy*devHeight/h);
 		}
 
@@ -109,6 +150,7 @@ public class SketchActivity extends Activity {
 		{
 			super(context);
 			P = new Point();
+			scaleRatio=1;
 			pixelpaint = new Paint();
 			pixelpaint.setStrokeCap(Paint.Cap.ROUND);
 			pixelpaint.setStrokeWidth(0);
@@ -119,7 +161,7 @@ public class SketchActivity extends Activity {
 		protected void onDraw(Canvas canvas)
 		{
 			//canvas.drawPoint(x, y, pixelpaint);
-			canvas.drawCircle(P.getX(), P.getY(), 10, pixelpaint);
+			canvas.drawCircle(P.getX(), P.getY(), 10*scaleRatio, pixelpaint);
 			invalidate();
 		}
 	}
@@ -130,56 +172,14 @@ public class SketchActivity extends Activity {
 		/**
 		 * Method extracts x,y, height and width from the received message.
 		 * */
-		public void extractCoordinatesFromMessage(String msg) {
+		public void setViewWithIncomingViewDims() {
 
-			String X = msg.substring(msg.indexOf("X")+1, msg.indexOf("Y"));
-			String Y = msg.substring(msg.indexOf("Y")+1,msg.indexOf("H"));
-			String H = msg.substring(msg.indexOf("H")+1,msg.indexOf("W"));
-			String W = msg.substring(msg.indexOf("W")+1);
-
-			float x=200,y=200,h=rv.getHeight(),w=rv.getWidth();
-			Log.i("X", X);
-			Log.i("Y", Y);
-			Log.i("H", H);
-			Log.i("W", W);
-			Log.i("X&Y&H&W", msg);
-			try
-			{
-				x = Float.valueOf(X.trim()).floatValue();
-				y = Float.valueOf(Y.trim()).floatValue();
-				h = Float.valueOf(H.trim()).floatValue();
-				w = Float.valueOf(W.trim()).floatValue();
-
-			}
-			catch (NumberFormatException nfe)
-			{
-				nfe.printStackTrace();
-			}
-
-			rv.setXandYRelative(x,y,h,w);
+			rv.setXandYRelative(vd.getPoint().getX(),vd.getPoint().getY(),vd.getHeight(),vd.getWidth());
 		}
 		public void receive(Message msg) {
 
-			for (String key : msg.getMeta().keySet()) {
-				//Log.d("Touch", key + ": " + msg.getMeta(key));
-			}
-			try {
-				String rec_message = new String(msg.getData(), "UTF-8");
-				Log.d("RECEIVED MESSAGEXXX", rec_message);
-				if(rec_message.contains("joined")) {
-
-					/**
-					 * Message is send as "X23Y34.0H200W300" without quotes where 23,34,200,300 are
-					 * x,y, height and width respectively.
-					 * */
-					String message = "X"+String.valueOf(rv.getX())+"Y"+String.valueOf(rv.getY())+"H"+String.valueOf(rv.getHeight())+"W"+rv.getWidth();
-					fooPub.send(message.getBytes());
-				} else {
-					extractCoordinatesFromMessage(rec_message);
-				}
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+			//TODO: Add Code for deserialization of received message to ViewDimso object...
+			setViewWithIncomingViewDims();
 		}
 	}
 
@@ -189,6 +189,8 @@ public class SketchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		rv = new RenderView(this);
+		vd = new ViewDims();
+
 
 		setContentView(rv);
 
@@ -197,11 +199,15 @@ public class SketchActivity extends Activity {
 		rv.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 
-				String message = "X"+String.valueOf(event.getX())+"Y"+String.valueOf(event.getY())+"H"+String.valueOf(rv.getHeight())+"W"+rv.getWidth();
 				Log.d("Touch X", String.valueOf(event.getX()));
 				Log.d("Touch Y", String.valueOf(event.getY()));
-				rv.setXandY(event.getX(),event.getY());
-				fooPub.send(message.getBytes());
+				rv.setXandY(event.getX(), event.getY());
+				vd.setPoint(rv.getPoint());
+				vd.setHeight(rv.getHeight());
+				vd.setWidth(rv.getWidth());
+				/*TODO: Change the following code for send with an extra param of serialization of message.
+				 */
+				fooPub.send(vd); //This line is compilation issue.
 				return true;
 			}
 		});
@@ -230,7 +236,5 @@ public class SketchActivity extends Activity {
 		fooSub = new Subscriber("sketch", new TestReceiver());
 		node.addSubscriber(fooSub);
 
-   		String message = new String("joined");
-		fooPub.send(message.getBytes());
 	}
 }
