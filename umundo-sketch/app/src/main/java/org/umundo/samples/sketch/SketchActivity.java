@@ -33,6 +33,101 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+
+
+
+/** Class which stores a x and y coordinates of a point. */
+class Point implements Serializable{
+
+	private float x;
+	private float y;
+
+	public void setX(float ix) {
+
+		x= ix;
+	}
+	public void setY(float iy) {
+
+		y= iy;
+	}
+
+	public float getX() {
+
+		return x;
+	}
+	public float getY() {
+
+		return y;
+	}
+	public void setPointWithPointObj(Point ip) {
+		x = ip.getX();
+		y = ip.getY();
+	}
+}
+
+/** Class for Storing dimensions of a View.*/
+class ViewDims implements Serializable{
+
+	private Point P;
+	private float width;
+	private float height;
+
+	/*Constructor*/
+	public ViewDims() {
+
+		width 	= 0;
+		height 	= 0;
+		P = new Point();
+	}
+	/** Getter methods */
+	public Point getPoint() {
+			return P;
+	}
+	public float getWidth() {
+		return width;
+	}
+	public float getHeight() {
+		return height;
+	}
+	/** Setter Methods */
+	public void setPoint(Point iP) {
+			P.setPointWithPointObj(iP);
+	}
+	public void setWidth(float iw) {
+		width = iw;
+	}
+	public void setHeight(float ih) {
+		height = ih;
+	}
+
+	public byte[] serialize() {
+		try {
+			ByteArrayOutputStream b = new ByteArrayOutputStream();
+			ObjectOutputStream o = new ObjectOutputStream(b);
+			o.writeObject(this);
+			return b.toByteArray();
+		}
+		catch(IOException ioe)
+		{
+			//Handle logging exception
+			return null;
+		}
+	}
+
+	public Object deserialize(byte[] bytes)  {
+		try {
+			ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+			ObjectInputStream o = new ObjectInputStream(b);
+			return o.readObject();
+		}
+		catch(Exception e){
+			//Handle logging exception
+			return null;
+		}
+	}
+}
+
 
 public class SketchActivity extends Activity {
 
@@ -46,97 +141,6 @@ public class SketchActivity extends Activity {
 
 	ViewDims vd;
 
-
-	/** Class which stores a x and y coordinates of a point. */
-	class Point {
-
-		private float x;
-		private float y;
-
-		public void setX(float ix) {
-
-			x= ix;
-		}
-		public void setY(float iy) {
-
-			y= iy;
-		}
-
-		public float getX() {
-
-			return x;
-		}
-		public float getY() {
-
-			return y;
-		}
-		public void setPointWithPointObj(Point ip) {
-			x = ip.getX();
-			y = ip.getY();
-		}
-	}
-
-	/** Class for Storing dimensions of a View.*/
-	class ViewDims implements Serializable{
-
-		private Point P;
-		private float width;
-		private float height;
-
-		/*Constructor*/
-		public ViewDims() {
-
-			width 	= 0;
-			height 	= 0;
-			P = new Point();
-		}
-		/** Getter methods */
-		public Point getPoint() {
-			return P;
-		}
-		public float getWidth() {
-			return width;
-		}
-		public float getHeight() {
-			return height;
-		}
-		/** Setter Methods */
-		public void setPoint(Point iP) {
-			P.setPointWithPointObj(iP);
-		}
-		public void setWidth(float iw) {
-			width = iw;
-		}
-		public void setHeight(float ih) {
-			height = ih;
-		}
-
-        public byte[] serialize() {
-            try {
-                ByteArrayOutputStream b = new ByteArrayOutputStream();
-                ObjectOutputStream o = new ObjectOutputStream(b);
-                o.writeObject(this);
-                return b.toByteArray();
-            }
-            catch(IOException ioe)
-            {
-                //Handle logging exception
-                return null;
-            }
-        }
-
-        public Object deserialize(byte[] bytes)  {
-            try {
-                ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-                ObjectInputStream o = new ObjectInputStream(b);
-                return o.readObject();
-            }
-            catch(Exception e){
-                //Handle logging exception
-                return null;
-            }
-        }
-	}
 
 	/** Custom View for drawing */
 	class RenderView extends View
@@ -211,7 +215,7 @@ public class SketchActivity extends Activity {
 		}
 		public void receive(Message msg) {
 
-			//TODO: Add Code for deserialization of received message to ViewDimso object...
+			vd = (ViewDims) vd.deserialize(msg.getData());
 			setViewWithIncomingViewDims();
 		}
 	}
@@ -232,14 +236,10 @@ public class SketchActivity extends Activity {
 		rv.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 
-				Log.d("Touch X", String.valueOf(event.getX()));
-				Log.d("Touch Y", String.valueOf(event.getY()));
 				rv.setXandY(event.getX(), event.getY());
 				vd.setPoint(rv.getPoint());
 				vd.setHeight(rv.getHeight());
 				vd.setWidth(rv.getWidth());
-				/*TODO: Change the following code for send with an extra param of serialization of message.
-				 */
 				fooPub.send(vd.serialize()); //This line is compilation issue.
 				return true;
 			}
