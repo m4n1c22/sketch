@@ -11,4 +11,4 @@
         android:id="@+id/surfaceView"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1.05" />
-</LinearLayout><!-- From: file:/home/m4n1c/AndroidStudioProjects/sketch/umundo-sketch/app/src/main/res/layout/activity_umundo_android.xml -->
+</LinearLayout><!-- From: file:/home/m4n1c/AndroidStudioProjects/sketch-master/umundo-sketch/app/src/main/res/layout/activity_umundo_android.xml -->

@@ -34,7 +34,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-
+import java.util.ArrayList;
 
 
 /** Class which stores a x and y coordinates of a point. */
@@ -149,6 +149,8 @@ public class SketchActivity extends Activity {
 		Point P;
 		float scaleRatio;
 
+		ArrayList<Point> arrayPoints;
+
 		public float getX() {
 
 			return P.getX();
@@ -180,13 +182,15 @@ public class SketchActivity extends Activity {
 			float devWidth=this.getWidth();
 
 			scaleRatio = devHeight/h;
-			setXandY(ix*devWidth/w,iy*devHeight/h);
+			setXandY(ix * devWidth / w, iy * devHeight / h);
 		}
 
 		public RenderView(Context context)
 		{
 			super(context);
 			P = new Point();
+			int size = this.getHeight()*this.getWidth();
+			arrayPoints= new ArrayList<Point>(size);
 			scaleRatio=1;
 			pixelpaint = new Paint();
 			pixelpaint.setStrokeCap(Paint.Cap.ROUND);
@@ -198,7 +202,10 @@ public class SketchActivity extends Activity {
 		protected void onDraw(Canvas canvas)
 		{
 			//canvas.drawPoint(x, y, pixelpaint);
-			canvas.drawCircle(P.getX(), P.getY(), 10*scaleRatio, pixelpaint);
+			for(Point p:arrayPoints) {
+				canvas.drawCircle(p.getX(), p.getY(), 10*this.getHeight()/640, pixelpaint);
+			}
+			//canvas.drawCircle(P.getX(), P.getY(), 10*scaleRatio, pixelpaint);
 			invalidate();
 		}
 	}
@@ -211,7 +218,27 @@ public class SketchActivity extends Activity {
 		 * */
 		public void setViewWithIncomingViewDims() {
 
-			rv.setXandYRelative(vd.getPoint().getX(),vd.getPoint().getY(),vd.getHeight(),vd.getWidth());
+			SketchActivity.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					float devHeight = rv.getHeight();
+					float devWidth = rv.getWidth();
+
+					float scaleRatioHeight, scaleRatioWidth;
+					scaleRatioHeight = devHeight / vd.getHeight();
+					scaleRatioWidth = devWidth / vd.getWidth();
+
+					Point P = new Point();
+					P.setX(vd.getPoint().getX() * scaleRatioWidth);
+					P.setY(vd.getPoint().getY() * scaleRatioHeight);
+
+					rv.arrayPoints.add(P);
+					rv.invalidate();
+				}
+			});
+
+
 		}
 		public void receive(Message msg) {
 
@@ -236,11 +263,16 @@ public class SketchActivity extends Activity {
 		rv.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 
-				rv.setXandY(event.getX(), event.getY());
-				vd.setPoint(rv.getPoint());
+				Point P = new Point();
+				P.setX(event.getX());
+				P.setY(event.getY());
+				rv.arrayPoints.add(P);
+				rv.invalidate();
+				//rv.setXandY(event.getX(), event.getY());
+				vd.setPoint(P);
 				vd.setHeight(rv.getHeight());
 				vd.setWidth(rv.getWidth());
-				fooPub.send(vd.serialize()); //This line is compilation issue.
+				fooPub.send(vd.serialize());
 				return true;
 			}
 		});
