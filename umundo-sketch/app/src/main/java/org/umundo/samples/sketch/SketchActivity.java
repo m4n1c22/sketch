@@ -37,29 +37,43 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
-/** Class which stores a x and y coordinates of a point. */
+/** Class which stores x and y coordinates of a point. */
 class Point implements Serializable{
 
 	private float x;
 	private float y;
 
+	/**
+	*	This method is used to set X coordinate of the point.
+	*/
 	public void setX(float ix) {
 
 		x= ix;
 	}
+	/**
+	*	This method is used to set Y coordinate of the point.
+	*/
 	public void setY(float iy) {
 
 		y= iy;
 	}
-
+	/**
+	*	This method is used to get X coordinate of the point.
+	*/
 	public float getX() {
 
 		return x;
 	}
+	/**
+	*	This method is used to get Y coordinate of the point.
+	*/
 	public float getY() {
 
 		return y;
 	}
+	/**
+	*	This method is used to set Given point with another object of point class.
+	*/
 	public void setPointWithPointObj(Point ip) {
 		x = ip.getX();
 		y = ip.getY();
@@ -69,9 +83,9 @@ class Point implements Serializable{
 /** Class for Storing dimensions of a View.*/
 class ViewDims implements Serializable{
 
-	private Point P;
-	private float width;
-	private float height;
+	private Point P; 	  /** Point object which stores the x and y coordinates of the touch view. */
+	private float width;  /** Stores width of the parent view which the touch is part of. */
+	private float height; /** Stores height of the parent view which the touch is part of. */
 
 	/*Constructor*/
 	public ViewDims() {
@@ -80,27 +94,39 @@ class ViewDims implements Serializable{
 		height 	= 0;
 		P = new Point();
 	}
+
 	/** Getter methods */
+	/** Get the point of Touch in the View. */
 	public Point getPoint() {
 			return P;
 	}
+	/** Get the width of the View. */
 	public float getWidth() {
 		return width;
 	}
+	/** Get the height of the View. */
 	public float getHeight() {
 		return height;
 	}
 	/** Setter Methods */
+	/** Set the point of Touch in the View with the new incoming point. */
 	public void setPoint(Point iP) {
 			P.setPointWithPointObj(iP);
 	}
+	/** Set the View width. */
 	public void setWidth(float iw) {
 		width = iw;
 	}
+	/** Set the View height. */
 	public void setHeight(float ih) {
 		height = ih;
 	}
 
+	/**
+	 * Serialize method for serializing the object of ViewDims class. This method creates a
+	 * serialized byte array of the object of class ViewDims. This method is used before publishing
+	 * the data in uMundo.
+	 * */
 	public byte[] serialize() {
 		try {
 			ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -114,7 +140,11 @@ class ViewDims implements Serializable{
 			return null;
 		}
 	}
-
+	/**
+	 * De-Serialize method for de-serializing the byte array to the object of ViewDims class. This
+	 * method creates a serialized byte array of the object of class ViewDims. This method is used
+	 * after receiving the data from uMundo.
+	 * */
 	public Object deserialize(byte[] bytes)  {
 		try {
 			ByteArrayInputStream b = new ByteArrayInputStream(bytes);
@@ -128,46 +158,99 @@ class ViewDims implements Serializable{
 	}
 }
 
+/**
+ * The main class which performs sketching application. It makes use of the uMundo Library for
+ * performing the operations of pub-sub systems. This class acts like a controller in a
+ * Model-View-Controller model.
+ * */
 
 public class SketchActivity extends Activity {
 
-
+	/**
+	 * Discovery object is used in this application to find the multicast DNS which can then be
+	 * used to perform zero configuration systems.
+	 */
 	Discovery disc;
+	/**
+	 * A node is created when the application is launched and added in the discovery list of nodes.
+	 * */
 	Node node;
+	/**
+	 * Publisher object which is used in the application to send points on touch events to the
+	 * subscriber system.
+	 * */
 	Publisher fooPub;
+	/**
+	 * Subscriber object which is used in the application to receive points from Publishing object/s
+	 * on delivering the events.
+	 * */
 	Subscriber fooSub;
 
+	/**
+	 * Custom view used to perform drawing operation in the application.
+	 * */
 	RenderView rv;
 
+	/**
+	 * Stores the dimensions required for the touch view.
+	 * */
 	ViewDims vd;
 
+	/**
+	 * Standard Device Height used for scaling an object when drawing.
+	 * */
+	final int STANDARD_DEVICE_HEIGHT = 640;
 
-	/** Custom View for drawing */
+	/**
+	 *  Custom View for drawing the sketches based on touch points provided by the user.
+	 *  */
 	class RenderView extends View
 	{
+		/** Paint object used for drawing points with different graphics options. */
 		Paint pixelpaint;
+		/** Point object which records the current touch point in the view. */
 		Point P;
+		/**
+		 * Scale ratio is used for scaling the coordinates when porting the coordinates from one
+		 * device to another.
+		 * */
 		float scaleRatio;
 
+		/**
+		 * This arraylist stores the array of points which has been/has to be drawn in the view.
+		 * */
 		ArrayList<Point> arrayPoints;
-
+		/**
+		 *	This method is used to get X coordinate of the point.
+		 */
 		public float getX() {
 
 			return P.getX();
 		}
+		/**
+		 *	This method is used to get Y coordinate of the point.
+		 */
 		public float getY() {
 
 			return P.getY();
 		}
+		/**
+		 *	This method is used to get the currently touched point.
+		 */
 		public Point getPoint() {
 
 			return P;
 		}
-
+		/**
+		 *	This method is used to set the currently touched point in the view.
+		 */
 		public void setPoint(Point iP) {
 
 			P.setPointWithPointObj(iP);
 		}
+		/**
+		 *	This method is used to set the X and Y coordinate of the touched point in the view.
+		 */
 		public void setXandY(float ix,float iy) {
 			P.setX(ix);
 			P.setY(iy);
@@ -185,6 +268,7 @@ public class SketchActivity extends Activity {
 			setXandY(ix * devWidth / w, iy * devHeight / h);
 		}
 
+		/** Constructor of Renderview which */
 		public RenderView(Context context)
 		{
 			super(context);
@@ -199,28 +283,39 @@ public class SketchActivity extends Activity {
 			pixelpaint.setStyle(Paint.Style.FILL);
 		}
 
+		/**
+		 * onDraw method is called whenever the view is reloaded.
+		 * */
 		protected void onDraw(Canvas canvas)
 		{
-			//canvas.drawPoint(x, y, pixelpaint);
+			/**
+			 * Array of points are drawn using the method drawcircle provided by canvas object.
+			 **/
 			for(Point p:arrayPoints) {
-				canvas.drawCircle(p.getX(), p.getY(), 10*this.getHeight()/640, pixelpaint);
+				canvas.drawCircle(p.getX(), p.getY(), 10 * this.getHeight() / STANDARD_DEVICE_HEIGHT, pixelpaint);
 			}
-			//canvas.drawCircle(P.getX(), P.getY(), 10*scaleRatio, pixelpaint);
 			invalidate();
 		}
 	}
 
+	/**
+	 * Receiver class which receives the messages which the node has subscribed to.
+	 **/
 	public class TestReceiver extends Receiver {
 
 
-		/**
-		 * Method extracts x,y, height and width from the received message.
-		 * */
+		/** Function which sets the view with received view dimensions. */
 		public void setViewWithIncomingViewDims() {
 
 			SketchActivity.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+
+					/**
+					 * Setting X and Y relative to the device. Here the mapping of the incoming
+					 * coordinates are evaluated with its width and height and the scale ratio is
+					 * determined and this value is mapped to the new set of coordinates.
+					 */
 
 					float devHeight = rv.getHeight();
 					float devWidth = rv.getWidth();
@@ -233,16 +328,22 @@ public class SketchActivity extends Activity {
 					P.setX(vd.getPoint().getX() * scaleRatioWidth);
 					P.setY(vd.getPoint().getY() * scaleRatioHeight);
 
+					/** Adding the received touch point to the array of points.*/
 					rv.arrayPoints.add(P);
+					/** Reloading the view. */
 					rv.invalidate();
 				}
 			});
-
-
 		}
+		/**
+		 * Receive method is called when a subscriber receives a message for the subscribed
+		 * channel.
+		 * */
 		public void receive(Message msg) {
 
+			/** De-serializing the received message and transforming it into ViewDims object.*/
 			vd = (ViewDims) vd.deserialize(msg.getData());
+			/** Setting the view with the received view dimensions. */
 			setViewWithIncomingViewDims();
 		}
 	}
@@ -252,32 +353,49 @@ public class SketchActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		/** Created render view and view dimensions. */
 		rv = new RenderView(this);
 		vd = new ViewDims();
 
 
+		/** Setting render view as the contentview of the activity.*/
 		setContentView(rv);
 
-		rv.setXandY(200,200);
-
+		/** Setting an OnTouch Listener with the content view.*/
 		rv.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 
+				/**
+				 * Creating the point object and recording the touched points in the Point object.
+				 **/
 				Point P = new Point();
 				P.setX(event.getX());
 				P.setY(event.getY());
+				/** Adding the touch event point into the array of points.*/
 				rv.arrayPoints.add(P);
+				/** Reloading the view. */
 				rv.invalidate();
-				//rv.setXandY(event.getX(), event.getY());
+				/**
+				 * Setting the view dimensions for sending a serializable object to the
+				 * subscriber.
+				 **/
 				vd.setPoint(P);
 				vd.setHeight(rv.getHeight());
 				vd.setWidth(rv.getWidth());
+				/**
+				 * Publishing the touch event to the subscribers.
+				 **/
 				fooPub.send(vd.serialize());
+
 				return true;
 			}
 		});
 
 
+		/**
+		 * Creating a wifi manager object for creating a multicast lock inorder to perform the
+		 * mDNS operations used by uMundo Library.
+		 * */
 		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		if (wifi != null) {
 			MulticastLock mcLock = wifi.createMulticastLock("mylock");
@@ -288,18 +406,27 @@ public class SketchActivity extends Activity {
 		}
 
 //		System.loadLibrary("umundoNativeJava");
+		/**
+		 * Loading the uMundoNative liibrary.
+		 * */
 		System.loadLibrary("umundoNativeJava_d");
 
+		/** Allocating the discovery node and setting the type as multicast DNS */
 		disc = new Discovery(DiscoveryType.MDNS);
-    
+
+		/** Creating a new node.*/
 		node = new Node();
+		/** Adding the created node into the discovery list.*/
 		disc.add(node);
 
+		/** Creating a publisher object with the channel name as sketch.*/
 		fooPub = new Publisher("sketch");
+		/** Adding the publisher to the node in the network which created few steps back.*/
 		node.addPublisher(fooPub);
-    
-		fooSub = new Subscriber("sketch", new TestReceiver());
-		node.addSubscriber(fooSub);
 
+		/** Creating a subscriber object with the channel name as sketch.*/
+		fooSub = new Subscriber("sketch", new TestReceiver());
+		/** Adding the subscriber to the node in the network which created few steps back.*/
+		node.addSubscriber(fooSub);
 	}
 }
