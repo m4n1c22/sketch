@@ -43,7 +43,7 @@ MERGED from com.android.support:support-v4:22.0.0:22:5
 		ADDED from AndroidManifest.xml:15:9
 	android:icon
 		ADDED from AndroidManifest.xml:14:9
-activity#org.umundo.samples.sketch.SketchActivity
+activity#com.umundo.sketch.SketchActivity
 ADDED from AndroidManifest.xml:16:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:19:13

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.umundo.samples.sketch.test">
+    package="com.umundo.sketch.test">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="22" />
 
@@ -9,8 +9,8 @@
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="org.umundo.samples.sketch"
+                     android:targetPackage="com.umundo.sketch"
                      android:handleProfiling="false"
                      android:functionalTest="false"
-                     android:label="Tests for org.umundo.samples.sketch"/>
+                     android:label="Tests for com.umundo.sketch"/>
 </manifest>
