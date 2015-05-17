@@ -1,6 +1,6 @@
 /**
  * @file	SketchActivity.java
- * @author 	Sreeram Sadasivam
+ * @author 	TK3 Group C
  * Application build for performing sketch operations in a distributed environment.
  * We make use of the middleware uMundo developed by TK group of TU Darmstadt for
  * performing this application.
