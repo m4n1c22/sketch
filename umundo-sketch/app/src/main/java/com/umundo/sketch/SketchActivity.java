@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 import org.umundo.core.Discovery;
 import org.umundo.core.Discovery.DiscoveryType;
@@ -409,6 +410,8 @@ public class SketchActivity extends Activity {
 		rv = new RenderView(this);
 		vd = new ViewDims();
 
+		/** The function called for display not to go off. */
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		/** Setting render view as the contentview of the activity.*/
 		setContentView(rv);
